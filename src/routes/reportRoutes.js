@@ -50,16 +50,20 @@ router.get('/student/:studentId', async (req, res) => {
 // =========================
 router.get('/low-attendance', async (req, res) => {
   try {
+    // IMPROVEMENT: Ask database to count attendance instead of fetching all records
     const students = await prisma.student.findMany({
       include: {
-        attendance: true
+        _count: {
+          select: { attendance: true }
+        }
       }
     });
 
     const totalSessions = await prisma.session.count();
 
     const report = students.map(student => {
-      const attended = student.attendance.length;
+      // IMPROVEMENT: Use the count provided by Prisma
+      const attended = student._count.attendance;
 
       const percentage =
         totalSessions === 0

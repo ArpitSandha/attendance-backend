@@ -5,16 +5,15 @@ const jwt = require('jsonwebtoken');
 const router = express.Router();
 
 const prisma = require('../config/db');
-
+// IMPROVEMENT: Moved middleware import to the top for better structure
+const teacherAuthMiddleware = require('../middleware/teacherAuthMiddleware');
 
 // ======================
 // TEACHER SIGNUP
 // ======================
 
 router.post('/signup', async (req, res) => {
-
   try {
-
     const {
       name,
       email,
@@ -53,25 +52,19 @@ router.post('/signup', async (req, res) => {
     });
 
   } catch (err) {
-
     res.status(500).json({
       success: false,
       message: err.message
     });
-
   }
-
 });
-
 
 // ======================
 // TEACHER LOGIN
 // ======================
 
 router.post('/login', async (req, res) => {
-
   try {
-
     const {
       email,
       password
@@ -80,6 +73,8 @@ router.post('/login', async (req, res) => {
     const teacher = await prisma.teacher.findUnique({
       where: { email }
     });
+    
+    console.log("Teacher Found:", teacher);
 
     if (!teacher) {
       return res.status(404).json({
@@ -122,53 +117,40 @@ router.post('/login', async (req, res) => {
     });
 
   } catch (err) {
-
     res.status(500).json({
       success: false,
       message: err.message
     });
-
   }
-
 });
 
 // ======================
 // VIEW SESSION ATTENDANCE
 // ======================
 
-router.get('/session/:sessionId', async (req, res) => {
-
+// IMPROVEMENT: Added teacherAuthMiddleware to protect this route
+router.get('/session/:sessionId', teacherAuthMiddleware, async (req, res) => {
   try {
-
     const sessionId = parseInt(req.params.sessionId);
 
     const session = await prisma.session.findUnique({
-
       where: {
         id: sessionId
       },
-
       include: {
-
         attendance: {
-
           include: {
             student: true
           }
-
         }
-
       }
-
     });
 
     if (!session) {
-
       return res.status(404).json({
         success: false,
         message: "Session not found"
       });
-
     }
 
     res.json({
@@ -177,34 +159,26 @@ router.get('/session/:sessionId', async (req, res) => {
     });
 
   } catch (err) {
-
     res.status(500).json({
       success: false,
       message: err.message
     });
-
   }
-
 });
 
 // ======================
 // VIEW PENDING DEVICES
 // ======================
 
-router.get('/pending-devices', async (req, res) => {
-
+router.get('/pending-devices', teacherAuthMiddleware, async (req,res)=>{
   try {
-
     const devices = await prisma.device.findMany({
-
       where: {
         isApproved: false
       },
-
       include: {
         student: true
       }
-
     });
 
     res.json({
@@ -214,37 +188,29 @@ router.get('/pending-devices', async (req, res) => {
     });
 
   } catch (err) {
-
     res.status(500).json({
       success: false,
       message: err.message
     });
-
   }
-
 });
 
 // ======================
 // APPROVE DEVICE
 // ======================
 
-router.post('/approve-device/:deviceId', async (req, res) => {
-
+router.post('/approve-device/:deviceId', teacherAuthMiddleware, async (req,res)=>{
   try {
-
     const deviceId = parseInt(req.params.deviceId);
 
     const device = await prisma.device.update({
-
       where: {
         id: deviceId
       },
-
       data: {
         isApproved: true,
         isActive: true
       }
-
     });
 
     res.json({
@@ -254,14 +220,11 @@ router.post('/approve-device/:deviceId', async (req, res) => {
     });
 
   } catch (err) {
-
     res.status(500).json({
       success: false,
       message: err.message
     });
-
   }
-
-});
+}); 
 
 module.exports = router;

@@ -2,6 +2,7 @@ require('dotenv').config();
 
 const studentRoutes = require('./routes/studentRoutes');
 const express = require('express');
+const cors = require('cors');
 const prisma = require('./config/db');
 const sessionRoutes = require('./routes/sessionRoutes');
 const attendanceRoutes = require('./routes/attendanceRoutes');
@@ -9,7 +10,7 @@ const reportRoutes = require('./routes/reportRoutes');
 const teacherRoutes = require('./routes/teacherRoutes');
 const app = express();
 
-
+app.use(cors());
 app.use(express.json());
 app.use((req, res, next) => {
   console.log(`${req.method} ${req.url}`);
@@ -31,6 +32,13 @@ app.get('/test-db', async (req, res) => {
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
+});
+
+app.get('/', (req, res) => {
+  res.json({
+    success: true,
+    message: 'Attendance Backend Running'
+  });
 });
 
 app.listen(5000, () => {
