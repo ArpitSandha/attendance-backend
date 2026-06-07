@@ -21,9 +21,6 @@ app.use('/session', sessionRoutes);
 app.use('/attendance', attendanceRoutes);
 app.use('/report', reportRoutes);
 app.use('/teacher', teacherRoutes);
-app.get('/', (req, res) => {
-  res.send("API running");
-});
 
 app.get('/test-db', async (req, res) => {
   try {
