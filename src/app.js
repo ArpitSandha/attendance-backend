@@ -41,7 +41,26 @@ app.get('/', (req, res) => {
   });
 });
 
-app.listen(5000, () => {
-  console.log("Server started on port 5000");
+async function testDB() {
+  try {
+    await prisma.$connect();
+    console.log("PostgreSQL Connected Successfully");
+  } catch (err) {
+    console.error("Database Connection Failed");
+    console.error(err);
+  }
+}
+
+testDB();
+
+app.get('/health', (req, res) => {
+  res.json({
+    success: true,
+    status: 'Backend Running'
+  });
+});
+
+app.listen(process.env.PORT || 5000, () => {
+  console.log(`Server started on port ${process.env.PORT || 5000}`);
 });
 
