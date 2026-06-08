@@ -61,7 +61,7 @@ router.post('/signup', validateSignup, async (req, res) => {
 // login
 router.post('/login', validateLogin, async (req, res) => {
   try {
-    const { email, password, uuid, deviceHash } = req.body;
+    const { email, password } = req.body;
 
     const student = await prisma.student.findUnique({
       where: { email },
@@ -101,59 +101,59 @@ router.post('/login', validateLogin, async (req, res) => {
     delete student.password;
 
     // first login → register device
-    if (student.devices.length === 0) {
-      await prisma.device.create({
-        data: {
-          uuid,
-          deviceHash,
-          studentId: student.id
-        }
-      });
+  //   if (student.devices.length === 0) {
+  //     await prisma.device.create({
+  //       data: {
+  //         uuid,
+  //         deviceHash,
+  //         studentId: student.id
+  //       }
+  //     });
 
-      return res.json({
-        success: true,
-        message: "Device registered",
-        token,
-        data: student
-      });
-    }
+  //     return res.json({
+  //       success: true,
+  //       message: "Device registered",
+  //       token,
+  //       data: student
+  //     });
+  //   }
 
-    // validate device
-    const validDevice = student.devices.find(
-      d => d.uuid === uuid && d.deviceHash === deviceHash
-    );
+  //   // validate device
+  //   const validDevice = student.devices.find(
+  //     d => d.uuid === uuid && d.deviceHash === deviceHash
+  //   );
 
-    if (!validDevice) {
+  //   if (!validDevice) {
 
-  // check if pending request already exists
-  const pendingDevice = await prisma.device.findFirst({
-    where: {
-      uuid,
-      deviceHash,
-      studentId: student.id
-    }
-  });
+  // // check if pending request already exists
+  // const pendingDevice = await prisma.device.findFirst({
+  //   where: {
+  //     uuid,
+  //     deviceHash,
+  //     studentId: student.id
+  //   }
+  // });
 
-  // create pending request
-  if (!pendingDevice) {
+  // // create pending request
+  // if (!pendingDevice) {
 
-    await prisma.device.create({
-      data: {
-        uuid,
-        deviceHash,
-        studentId: student.id,
-        isApproved: false,
-        isActive: false
-      }
-    });
+  //   await prisma.device.create({
+  //     data: {
+  //       uuid,
+  //       deviceHash,
+  //       studentId: student.id,
+  //       isApproved: false,
+  //       isActive: false
+  //     }
+  //   });
 
-  }
+  // }
 
-  return res.status(403).json({
-    success: false,
-    message: "New device request submitted for approval"
-  });
-    }
+  // return res.status(403).json({
+  //   success: false,
+  //   message: "New device request submitted for approval"
+  // });
+  //   }
 
     res.json({
       success: true,
