@@ -10,13 +10,26 @@ const validateSignup = (req, res, next) => {
   next();
 };
 
-const validateLogin = (req, res, next) => {
-  const { email, password, uuid, deviceHash } = req.body;
+// const validateLogin = (req, res, next) => {
+//   const { email, password, uuid, deviceHash } = req.body;
 
-  if (!email || !password || !uuid || !deviceHash) {
+//   if (!email || !password || !uuid || !deviceHash) {
+//     return res.status(400).json({
+//       success: false,
+//       message: "All login fields are required"
+//     });
+//   }
+
+//   next();
+// };
+
+const validateLogin = (req, res, next) => {
+  const { email, password } = req.body;
+
+  if (!email || !password) {
     return res.status(400).json({
       success: false,
-      message: "All login fields are required"
+      message: "Email and password are required"
     });
   }
 
